@@ -1,12 +1,12 @@
+// index.js
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config();
-const mongoose = require('mongoose');
+const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/auth');
-const departmentRoutes = require('./routes/department');
-const errorHandler = require('./middleware/errorHandler');
+const documentRoutes = require('./routes/documentRoutes'); // Correctly import document routes
 
 const app = express();
 
@@ -18,16 +18,13 @@ app.use(cors({
   credentials: true,
 }));
 
-// Static folder for uploaded files
-app.use('/uploads', express.static('uploads'));
+// Connect to database
+connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', departmentRoutes);
-app.use(errorHandler);
+app.use('/api', documentRoutes); // Mount document routes under '/api'
 
-
-// Start the server
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

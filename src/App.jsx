@@ -8,7 +8,8 @@ import FacultyDashboard from './dashboard/FacultyDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
 import IQACDashboard from './dashboard/IQACDashboard';
 import ViewPage from './dashboard/View';
-import DepartmentDetail from "./dashboard/DepartmentDetail";
+import DocumentViewer from "./dashboard/DocumentViewer";
+import UploadDocument from "./dashboard/UploadDocument";
 
 
 // ProtectedRoute Component
@@ -34,7 +35,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="/class/:classId" element={<ViewPage />} />
-          <Route path="/department/:deptId" element={<DepartmentDetail />} />
+          <Route path="/document-viewer" element={<DocumentViewer />} />
+          <Route path="/upload/:deptName" element={<UploadDocument />} />
 
           {/* Protected Dashboard Routes */}
           <Route path="hod-dashboard" element={

@@ -1,65 +1,55 @@
-// IQACDashboard.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Building, Monitor, Cpu, Code, Database, User } from "lucide-react";
 
-const IQACDashboard = () => {
-  const [documents, setDocuments] = useState([]);
+const IQAC = () => {
+  const [departments, setDepartments] = useState([]);
   const navigate = useNavigate();
 
-  const departments = [
-    { id: 1, name: 'Computer Science' },
-    { id: 2, name: 'Mechanical Engineering' },
-    { id: 3, name: 'Electrical Engineering' },
-    { id: 4, name: 'Information Technology' },
-    { id: 5, name: 'AIDS' },
-    { id: 6, name: 'AIML' },
-    { id: 7, name: 'Civil Engineering' },
-    { id: 8, name: 'Biotechnology' },
-  ];
+  useEffect(() => {
+    setDepartments([
+      { id: 1, name: "Computer Science", icon: <Monitor className="w-10 h-10 text-blue-500" /> },
+      { id: 2, name: "Mechanical Engineering", icon: <Cpu className="w-10 h-10 text-yellow-500" /> },
+      { id: 3, name: "Electrical Engineering", icon: <Database className="w-10 h-10 text-green-500" /> },
+      { id: 4, name: "Information Technology", icon: <Code className="w-10 h-10 text-purple-500" /> },
+      { id: 5, name: "AIDS", icon: <User className="w-10 h-10 text-pink-500" /> },
+      { id: 6, name: "AIML", icon: <Building className="w-10 h-10 text-red-500" /> }
+    ]);
+  }, []);
 
-  const handleDeptClick = async (deptId) => {
-    try {
-      const response = await axios.get(`http://localhost:5002/api/documents/${deptId}`);
-      setDocuments(response.data);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    }
+  const handleCardClick = (department) => {
+    navigate("/document-viewer", {
+      state: { departmentName: department },  // Passing the department name as state
+    });
   };
 
   return (
-    <div className="p-5 bg-gray-100">
-      <h1 className="text-2xl font-bold mb-5 text-center">IQAC Admin Dashboard</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        {departments.map((dept) => (
-          <div
-            key={dept.id}
-            className="bg-white border border-gray-300 rounded-lg p-5 shadow hover:shadow-lg cursor-pointer text-center"
-            onClick={() => handleDeptClick(dept.id)}
-          >
-            <h2 className="text-xl font-semibold mb-3">{dept.name}</h2>
-          </div>
-        ))}
-      </div>
-      <div className="mt-10">
-        {documents.length > 0 ? (
-          <div>
-            <h2 className="text-xl font-bold mb-3">Documents:</h2>
-            <ul>
-              {documents.map((doc) => (
-                <li key={doc._id} className="mb-2">
-                  <h3 className="text-lg font-semibold">{doc.title}</h3>
-                  <p>{doc.content}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-center">No documents available for this department.</p>
-        )}
+    <div className="relative top-10 bg-gray-100 p-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">
+          IQAC Admin Dashboard
+        </h1>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {departments.map((dept) => (
+            <div
+              key={dept.id}
+              className="bg-white shadow-xl rounded-2xl p-6 cursor-pointer transition-transform transform hover:scale-105 hover:shadow-2xl"
+              onClick={() => handleCardClick(dept.name)}
+            >
+              <div className="flex items-center space-x-4">
+                {dept.icon}
+                <h2 className="text-2xl font-semibold text-gray-800">{dept.name}</h2>
+              </div>
+              <p className="mt-4 text-gray-600">
+                Manage documents and activities for the {dept.name} department.
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-export default IQACDashboard;
+export default IQAC;
