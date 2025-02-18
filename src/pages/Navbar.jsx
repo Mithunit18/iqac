@@ -28,6 +28,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('loggedInDepartmentId');
     setIsLoggedIn(false); // Trigger re-render
     navigate('/');
   };

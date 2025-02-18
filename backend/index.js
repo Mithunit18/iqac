@@ -1,4 +1,3 @@
-// index.js
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -6,7 +5,8 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/auth');
-const documentRoutes = require('./routes/documentRoutes'); // Correctly import document routes
+const documentRoutes = require('./routes/documentRoutes');
+const hodRoutes = require('./routes/hodRoutes'); // Import HOD routes
 
 const app = express();
 
@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   origin: process.env.FRONTEND_URL,
+  methods: ['GET','POST','PUT','DELETE'],
   credentials: true,
 }));
 
@@ -24,6 +25,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', documentRoutes); // Mount document routes under '/api'
+app.use('/api/hod', hodRoutes); // Mount HOD routes under '/api/hod'
 
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {

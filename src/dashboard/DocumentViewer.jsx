@@ -46,7 +46,7 @@ const DocumentViewer = () => {
     try {
       const response = await axios.post('http://localhost:5002/api/upload', formData);
       console.log('Document uploaded successfully:', response.data);
-      fetchDocuments(); // Refresh documents after upload
+      fetchDocuments(departmentName); // Refresh documents after upload
     } catch (error) {
       console.error('Error uploading document:', error);
     } finally {
@@ -86,7 +86,7 @@ const DocumentViewer = () => {
           {documents.length === 0 ? (
             <p className="text-lg text-gray-500">No documents uploaded yet.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-4 max-h-96 overflow-y-auto">
               {documents.map((doc) => (
                 <li
                   key={doc._id}
@@ -98,7 +98,7 @@ const DocumentViewer = () => {
                       <p className="text-lg font-medium text-gray-800">{doc.documentName}</p>
                     </div>
                     <a
-                      href={`http://localhost:5002/api/document/${doc.documentName}`}  // Make sure this URL points to your backend
+                      href={`http://localhost:5002/api/document/${doc.documentName}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 transition-colors flex items-center space-x-1"

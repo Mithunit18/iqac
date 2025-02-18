@@ -1,74 +1,82 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const HOD = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [buttonPosition, setButtonPosition] = useState(0); // To track the position of the menu button
   const navigate = useNavigate();
 
-  const handleViewClick = (classId) => {
-    navigate(`/class/${classId}`);
+  const departments = [
+    { id: 1, name: "Information Technology" },
+    { id: 2, name: "Computer Science" },
+    { id: 3, name: "Electrical and Electronics" },
+    { id: 4, name: "Mechanical" },
+    { id: 5, name: "Civil" },
+    { id: 6, name: "Electronics and communication" },
+    { id: 7, name: "Biotechnology" }
+  ];
+
+  const handleViewClick = (departmentId) => {
+    const loggedInDepartmentId = localStorage.getItem('loggedInDepartmentId');
+    
+    if (!loggedInDepartmentId) {
+      navigate("/login");
+    } else if (parseInt(loggedInDepartmentId) !== departmentId) {
+      alert("You are not authorized to view this department.");
+    } else {
+      navigate(`/view-department/${departmentId}`);
+    }
   };
 
-  const handleMenuButtonClick = (e) => {
-    const buttonRect = e.target.getBoundingClientRect(); // Get the position of the menu button
-    setButtonPosition(buttonRect.bottom); // Set the bottom position of the button for dropdown
-    setMenuOpen((prev) => !prev);
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInDepartmentId");
+    window.location.reload();
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 w-full">
-      {/* Header */}
-      <header className="flex justify-between items-center bg-blue-900 text-white p-4 w-full mt-28 z-10 relative">
-        <div className="flex flex-col sm:flex-row sm:space-x-4 sm:items-center">
-          <h1 className="text-xl font-bold">DEPARTMENT OF INFORMATION TECHNOLOGY</h1>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button className="text-l font-bold hidden sm:block rounded-xl p-3 hover:bg-sky-700 hover:cursor-pointer">UPLOAD</button>
-          <button
-            className="bg-transparent border-none text-2xl cursor-pointer"
-            onClick={handleMenuButtonClick}
-          >
-            <FiMenu />
-          </button>
-        </div>
+      <header className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-blue-900 text-white p-4 w-full mt-28 z-10 relative shadow-lg rounded-b-lg">
+        <h1 className="text-xl font-bold tracking-wider">Departments Dashboard</h1>
+        <button
+          className="bg-transparent border-none text-2xl cursor-pointer"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label="Toggle menu"
+        >
+          <FiMenu />
+        </button>
       </header>
 
-      {/* Toggle Menu */}
       {menuOpen && (
-        <div
-          className="absolute right-4 bg-white shadow-lg rounded-lg p-4 z-20"
-          style={{ top: `${buttonPosition + 10}px` }} // Position the dropdown just below the button
-        >
+        <div className="absolute right-4 top-40 bg-white shadow-xl rounded-4xl p-3 z-20 border border-gray-200 hover:bg-gray-300 transition">
           <ul className="list-none p-0 m-0">
-            <li className="py-2 cursor-pointer hover:text-blue-900">NOTIFICATION</li>
-            <li className="py-2 cursor-pointer hover:text-blue-900">LogOut</li>
+            {/* Add Logout Button */}
+            <li
+              className="py-2 cursor-pointer hover:text-blue-900 "
+              onClick={handleLogout}
+            >
+              Logout
+            </li>
           </ul>
         </div>
       )}
 
-      {/* Main Content */}
       <main className="flex-grow p-6 w-full">
-        <div className="flex flex-wrap gap-6 justify-center p-5">
-          {/* Cards */}
-          {Array(4)
-            .fill(0)
-            .map((_, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-md rounded-lg p-6 w-80 h-80 flex flex-col justify-between transition-transform duration-300 hover:transform hover:-translate-y-3 hover:shadow-xl"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-5">
+          {departments.map((department) => (
+            <div
+              key={department.id}
+              className="bg-white shadow-lg rounded-lg p-6 w-full transition-transform duration-300 hover:transform hover:-translate-y-3 hover:shadow-2xl hover:scale-105"
+            >
+              <h2 className="text-lg font-semibold text-gray-800">{department.name}</h2>
+              <button
+                className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-500"
+                onClick={() => handleViewClick(department.id)}
               >
-                <h2 className="text-lg font-bold">Class {String.fromCharCode(65 + index)}</h2>
-                <p className="text-gray-600 text-sm">Coordinator XXXX.</p>
-                <button
-                  className="bg-blue-900 text-white px-4 py-2 rounded-md transition-colors duration-200 hover:bg-blue-600"
-                  onClick={() => handleViewClick(index + 1)}
-                >
-                  View
-                </button>
-              </div>
-            ))}
+                View Department
+              </button>
+            </div>
+          ))}
         </div>
       </main>
     </div>
