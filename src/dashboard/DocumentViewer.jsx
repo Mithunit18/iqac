@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
-import { CloudUpload, FileText, DownloadCloud } from 'lucide-react';
+import { FileText, DownloadCloud, ClipboardList } from 'lucide-react';
+import TaskAssignModal from './TaskAssignModal';
 
 const DocumentViewer = () => {
   const [documents, setDocuments] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState([]);
 
-  // Get the department name from state passed via navigate
+  // Manually added tasks
+  const tasks = [
+    { id: 1, name: "Prepare semester report" },
+    { id: 2, name: "Update project guidelines" },
+    { id: 3, name: "Organize guest lecture" },
+    { id: 4, name: "Conduct faculty training" },
+    { id: 5, name: "Arrange internship program" },
+    { id: 6, name: "Update course material" }
+  ];
+
   const location = useLocation();
   const departmentName = location.state?.departmentName;
 
-  // Fetch documents for the selected department
   useEffect(() => {
     if (departmentName) {
       fetchDocuments(departmentName);
@@ -27,58 +37,44 @@ const DocumentViewer = () => {
     }
   };
 
-  const handleFileUpload = async (e) => {
-    e.preventDefault();
-    setUploading(true);
+  const handleTaskSelection = (taskId) => {
+    setSelectedTasks((prevSelected) =>
+      prevSelected.includes(taskId)
+        ? prevSelected.filter((id) => id !== taskId)
+        : [...prevSelected, taskId]
+    );
+  };
 
-    const formData = new FormData();
-    const file = e.target.files[0];
-
-    if (!file) {
-      alert('Please select a file to upload');
-      setUploading(false);
-      return;
-    }
-
-    formData.append('document', file);
-    formData.append('departmentName', departmentName);
-
+  const handleTaskAssignment = async (departmentId) => {
     try {
-      const response = await axios.post('http://localhost:5002/api/upload', formData);
-      console.log('Document uploaded successfully:', response.data);
-      fetchDocuments(departmentName); // Refresh documents after upload
+      await axios.post('http://localhost:5002/api/assign-tasks', {
+        departmentId,
+        tasks: selectedTasks,
+      });
+      setIsTaskModalOpen(false);
+      setSelectedTasks([]); // Reset selection
     } catch (error) {
-      console.error('Error uploading document:', error);
-    } finally {
-      setUploading(false);
+      console.error('Error assigning tasks:', error);
     }
   };
 
   return (
     <div className="relative top-13 bg-gray-50 py-10 px-10">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
-        <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">{departmentName} Documents</h1>
+        <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
+          {departmentName} Documents
+        </h1>
 
-        {/* File Upload Section */}
+        {/* Assign Task Button */}
         <div className="mb-6 flex justify-center">
-          <label className="flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg cursor-pointer hover:bg-blue-700 transition-all shadow-lg">
-            <CloudUpload className="w-5 h-5" />
-            <span>{uploading ? 'Uploading...' : 'Upload Document'}</span>
-            <input
-              type="file"
-              onChange={handleFileUpload}
-              className="hidden"
-              disabled={uploading}
-            />
-          </label>
+          <button
+            onClick={() => setIsTaskModalOpen(true)}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg"
+          >
+            <ClipboardList className="w-5 h-5" />
+            <span>Assign Task</span>
+          </button>
         </div>
-
-        {/* Display uploading status */}
-        {uploading && (
-          <div className="flex justify-center mb-4">
-            <p className="text-lg text-yellow-500">Uploading... Please wait.</p>
-          </div>
-        )}
 
         {/* Document List */}
         <div>
@@ -113,6 +109,17 @@ const DocumentViewer = () => {
           )}
         </div>
       </div>
+
+      {/* Task Assignment Modal */}
+      <TaskAssignModal
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        department={{ name: departmentName }}
+        tasks={tasks} // Manually added tasks
+        selectedTasks={selectedTasks}
+        onTaskSelection={handleTaskSelection}
+        onTaskAssignment={handleTaskAssignment}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const HOD = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,13 +13,21 @@ const HOD = () => {
     { id: 3, name: "Electrical and Electronics" },
     { id: 4, name: "Mechanical" },
     { id: 5, name: "Civil" },
-    { id: 6, name: "Electronics and communication" },
-    { id: 7, name: "Biotechnology" }
+    { id: 6, name: "Electronics and Communication" },
+    { id: 7, name: "Biotechnology" },
+  ];
+
+  const notifications = [
+    "New task assigned: Prepare semester report",
+    "Deadline reminder: Upload project reports",
+    "Meeting scheduled for curriculum update",
+    "Guest lecture on AI scheduled for next week",
+    "New document uploaded by faculty",
   ];
 
   const handleViewClick = (departmentId) => {
-    const loggedInDepartmentId = localStorage.getItem('loggedInDepartmentId');
-    
+    const loggedInDepartmentId = localStorage.getItem("loggedInDepartmentId");
+
     if (!loggedInDepartmentId) {
       navigate("/login");
     } else if (parseInt(loggedInDepartmentId) !== departmentId) {
@@ -32,6 +40,11 @@ const HOD = () => {
   const handleLogout = () => {
     localStorage.removeItem("loggedInDepartmentId");
     window.location.reload();
+  };
+
+  const handleNotification = () => {
+    const randomIndex = Math.floor(Math.random() * notifications.length);
+    toast(notifications[randomIndex]); // Show a random notification
   };
 
   return (
@@ -48,11 +61,16 @@ const HOD = () => {
       </header>
 
       {menuOpen && (
-        <div className="absolute right-4 top-40 bg-white shadow-xl rounded-4xl p-3 z-20 border border-gray-200 hover:bg-gray-300 transition">
+        <div className="absolute right-4 top-40 bg-white shadow-xl rounded-lg p-3 z-20 border border-gray-200">
           <ul className="list-none p-0 m-0">
-            {/* Add Logout Button */}
             <li
-              className="py-2 cursor-pointer hover:text-blue-900 "
+              className="py-2 cursor-pointer hover:text-blue-900"
+              onClick={handleNotification}
+            >
+              Notification
+            </li>
+            <li
+              className="py-2 cursor-pointer hover:text-blue-900"
               onClick={handleLogout}
             >
               Logout

@@ -39,7 +39,7 @@ const Home = () => {
             navigate('/hod-dashboard');
             break;
           case 'faculty':
-            navigate('/faculty-dashboard');
+            navigate('/faculty-dept');
             break;
           case 'admin':
             navigate('/admin-dashboard');

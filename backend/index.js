@@ -7,6 +7,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const documentRoutes = require('./routes/documentRoutes');
 const hodRoutes = require('./routes/hodRoutes'); // Import HOD routes
+const facultyRoutes = require('./routes/facultyRoutes');
 
 const app = express();
 
@@ -26,6 +27,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api', documentRoutes); // Mount document routes under '/api'
 app.use('/api/hod', hodRoutes); // Mount HOD routes under '/api/hod'
+app.use('/api/faculty',facultyRoutes)
 
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {

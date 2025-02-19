@@ -2,76 +2,90 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FiDownload } from "react-icons/fi";
-import { IoCompassOutline } from "react-icons/io5";
 
-const ClassDetails = () => {
-  const { classId,departmentName } = useParams();
+function FacDoc() {
+  const { departmentId } = useParams();
   const location = useLocation();
-  // Retrieve the selected section from navigation state; default to "Academic Details"
   const section = location.state?.section || "Academic Details";
-  console.log(section);
-  const [documents, setDocuments] = useState([]); // Always an array
+
+  const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [departmentName, setDepartmentName] = useState("");
+  const [classId, setClassId] = useState("");
 
   useEffect(() => {
-    fetchDocuments();
-  }, [classId, section]);
+    const deptName = location.state?.departmentName;
+    const clsId = location.state?.classId;
 
-  const fetchDocuments = async () => {
+    console.log("Department Name:", deptName);
+    console.log("Class ID:", clsId);
+
+    setDepartmentName(deptName || "DefaultDepartment");
+    setClassId(clsId || "");
+
+    if (deptName && clsId && section) {
+      fetchDocuments(deptName, clsId, section);
+    }
+  }, [section, location]);
+
+  const fetchDocuments = async (deptName, clsId, section) => {
     try {
-      // Replace with your actual endpoint that filters by department, class, and section
-      const response = await axios.get(
-        `/api/documents/department/${departmentName}/class/${classId}`,
-        { params: { section } }
-      );
-      // Ensure the response is an array; if not, fallback to empty array
-      setDocuments(Array.isArray(response.data) ? response.data : []);
+      const response = await axios.get(`http://localhost:5002/api/faculty/documents`, {
+        params: { departmentName: deptName, classId: clsId, section },
+      });
+      setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
-      setDocuments([]); // Fallback to empty array on error
     }
   };
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
-  
     const formData = new FormData();
     const file = e.target.files[0];
-  
+
     if (!file) {
       alert("Please select a file to upload");
       return;
     }
-  
+
+    if (!departmentName || !classId || !section) {
+      alert("Department name, Class ID, and Section are required");
+      return;
+    }
+
     formData.append("document", file);
     formData.append("departmentName", departmentName);
-    formData.append("classid",classId);
-    formData.append("section",section);
-    console.log(departmentName);
-  
+    formData.append("classId", classId);
+    formData.append("section", section);
+
     try {
-      const response = await axios.post('http://localhost:5002/api/hod/upload', formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      setUploading(true);
+      await axios.post("http://localhost:5002/api/faculty/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("Document uploaded successfully:", response.data);
+
+      fetchDocuments(departmentName, classId, section);
     } catch (error) {
       console.error("Error uploading document:", error);
+    } finally {
+      setUploading(false);
     }
   };
-  
-
-
 
   return (
-    <div className=" bg-gray-50 py-10 px-4">
+    <div className="bg-gray-50 py-10 px-4">
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
           Class {classId} - {section} Documents
         </h2>
 
-        {/* Upload Document Section */}
+        {!departmentName && (
+          <p className="text-red-600 text-center mb-4">
+            Department Name is required to upload documents.
+          </p>
+        )}
+
         <div className="mb-8">
           <label
             htmlFor="file-upload"
@@ -84,11 +98,10 @@ const ClassDetails = () => {
             id="file-upload"
             className="hidden"
             onChange={handleFileUpload}
-            disabled={uploading}
+            disabled={uploading || !departmentName}
           />
         </div>
 
-        {/* Display Documents */}
         <h3 className="text-2xl font-semibold mb-4 text-gray-700">Uploaded Documents</h3>
         {documents.length === 0 ? (
           <p className="text-center text-lg text-gray-500">No documents uploaded yet.</p>
@@ -100,11 +113,9 @@ const ClassDetails = () => {
                 className="p-4 bg-gray-100 rounded-md shadow-md hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="flex justify-between items-center">
-                  <p className="text-lg font-medium text-gray-800 truncate">
-                    {doc.documentName}
-                  </p>
+                  <p className="text-lg font-medium text-gray-800 truncate">{doc.documentName}</p>
                   <a
-                    href={doc.documentUrl}
+                    href={`http://localhost:5002/api/faculty/${doc.documentUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
@@ -120,6 +131,6 @@ const ClassDetails = () => {
       </div>
     </div>
   );
-};
+}
 
-export default ClassDetails;
+export default FacDoc;

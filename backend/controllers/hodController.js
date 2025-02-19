@@ -32,6 +32,7 @@ const getDocumentsByClass = async (req, res) => {
   const { departmentName, classId } = req.params;
   try {
     const documents = await Document.find({ departmentName, classId });
+    console.log(documents);
     res.status(200).json(documents);
   } catch (error) {
     console.error('Error fetching documents by class:', error);

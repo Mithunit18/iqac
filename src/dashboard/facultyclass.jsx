@@ -57,8 +57,7 @@ const departmentNames = {
   6: "Electronics and Communication",
   7: "Biotechnology",
 };
-
-const DepartmentDetails = () => {
+function Facultyclass(){
   const { departmentId } = useParams();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -78,7 +77,7 @@ const DepartmentDetails = () => {
   }, [numericDepartmentId]);
 
   const handleClassViewClick = (classId) => {
-    navigate(`/view-class/${classId}/${departmentName}`);
+    navigate(`/view-faclogin/${classId}/${departmentName}`);
   };
 
   return (
@@ -131,4 +130,4 @@ const DepartmentDetails = () => {
   );
 };
 
-export default DepartmentDetails;
+export default Facultyclass;
