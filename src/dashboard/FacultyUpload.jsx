@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const FacultyUpload = () => {
   const { email,initialDepartment } = useParams(); // Get faculty email from URL params
@@ -11,17 +12,28 @@ const FacultyUpload = () => {
 
   // Fetch uploaded documents
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    console.log("Fetching documents for email:", email); // Debugging log
+    if (email) fetchDocuments(); // Only call if email exists
+  }, [email]);
+  
 
   const fetchDocuments = async () => {
+    console.log("Fetching documents for:", email); // Debugging
+  
+    if (!email) {
+      console.error("Email is undefined!");
+      return;
+    }
+  
     try {
       const response = await axios.get(`http://localhost:5002/api/faculty/documents/${email}`);
+      console.log("Documents fetched:", response.data); // Debugging response
       setDocuments(response.data);
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      console.error("Error fetching documents:", error.response?.data || error.message);
     }
   };
+  
 
   // Handle File Selection
   const handleFileChange = (event) => {
@@ -34,26 +46,28 @@ const FacultyUpload = () => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("emailId", email); // Match backend expectations
+    formData.append("departmentName", initialDepartment);
 
     try {
       setLoading(true);
-      console.log(email+initialDepartment);
-      await axios.post(`http://localhost:5002/api/faculty/upload`, {email,initialDepartment}, {
+      console.log(email, initialDepartment); // Now correctly sent
+      await axios.post(`http://localhost:5002/api/faculty/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      alert("File uploaded successfully!");
+     toast.success("File uploaded successfully!");
       setSelectedFile(null);
-      fetchDocuments(); // Refresh document list
+      fetchDocuments();
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
       setLoading(false);
     }
-  };
+};
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 p-6">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md text-center">
         <h2 className="text-3xl font-bold text-blue-700 mb-4">Upload Faculty Documents</h2>
         

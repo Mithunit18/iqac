@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FiDownload } from "react-icons/fi";
 import { IoCloudUploadOutline } from "react-icons/io5";
+import toast from "react-hot-toast";
 
 const ClassDetails = () => {
   const { classId, departmentName } = useParams();
@@ -42,11 +43,11 @@ const ClassDetails = () => {
         }
       );
       console.log("Document uploaded to Documents collection:", response.data);
-      alert("Document uploaded successfully!");
+      toast.success("Document uploaded successfully!");
       fetchFacultyDocuments(); // Refresh document list after upload
     } catch (error) {
       console.error("Error uploading document:", error);
-      alert("Failed to upload document.");
+      toast.error("Failed to upload document.");
     }
     setUploading(false);
   };

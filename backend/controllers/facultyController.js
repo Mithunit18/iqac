@@ -44,6 +44,8 @@ const uploadSingle = upload.single("file");
 // 📌 Upload Document Function
 const uploadDocument = async (req, res) => {
   const { emailId, departmentName } = req.body;
+  console.log(emailId);
+  console.log(departmentName);
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -69,8 +71,12 @@ const uploadDocument = async (req, res) => {
 
 // 📌 Get Documents Function
 const getDocuments = async (req, res) => {
-  const { emailId } = req.params;
-  
+  const { emailId } = req.params; // Ensure correct extraction
+
+  if (!emailId) {
+    return res.status(400).json({ error: "Email ID is required" });
+  }
+
   try {
     const facultyDocuments = await Faculty.find({ emailId });
 
@@ -84,6 +90,7 @@ const getDocuments = async (req, res) => {
     res.status(500).json({ error: "Error fetching faculty documents" });
   }
 };
+
 
 
 module.exports = { getFacultyAuth, 
