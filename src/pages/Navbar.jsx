@@ -1,43 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa'; // Import Star icon
 import clogo2 from '../assets/clogo2.jpg';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage the menu visibility
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isHomePage = location.pathname === '/';
+  const isIQACDashboard = location.pathname.startsWith('/iqac-dashboard');
 
-  // Check the login status on component mount and whenever the token changes
   useEffect(() => {
     const checkLoginStatus = () => {
       setIsLoggedIn(!!localStorage.getItem('token'));
     };
 
-    // Initially check login status
     checkLoginStatus();
-
-    // Optionally, add a listener for when the localStorage changes in the same window
-    const interval = setInterval(checkLoginStatus, 1000); // Check every second
-
-    return () => {
-      clearInterval(interval); // Clean up the interval when the component is unmounted
-    };
-  }, []); // Empty dependency array ensures this runs only once when the component mounts
+    const interval = setInterval(checkLoginStatus, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('loggedInDepartmentId');
-    setIsLoggedIn(false); // Trigger re-render
+    setIsLoggedIn(false);
     navigate('/');
   };
 
-  const handleHome = () => {
-    navigate('/');
+  const handleGenerate = () => {
+    console.log('Generate button clicked!');
+    // Add the function logic here (e.g., generating reports, exporting data)
   };
 
-  // Toggle the mobile menu visibility
+  const handleNavigation = () => {
+    if (isIQACDashboard) {
+      handleGenerate();
+    } else {
+      navigate('/');
+    }
+  };
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -64,10 +67,11 @@ const Navbar = () => {
       {/* Right: Desktop Navigation Buttons */}
       <div className='hidden md:flex space-x-4 pr-8'>
         <button 
-          className='px-5 py-2 text-white font-semibold rounded-full bg-black hover:bg-gray-800 hover:scale-105 transition-all duration-300' 
-          onClick={handleHome}
+          className={`px-5 py-2 flex items-center gap-2 text-white font-semibold rounded-full transition-all duration-300 ${isIQACDashboard ? 'bg-green-600 hover:bg-green-700' : 'bg-black hover:bg-gray-800'} hover:scale-105`} 
+          onClick={handleNavigation}
         >
-          HOME
+          {isIQACDashboard && <FaStar className="text-yellow-400" />} {/* Star Icon */}
+          {isIQACDashboard ? 'GENERATE' : 'HOME'}
         </button>
         {isLoggedIn && !isHomePage && (
           <button
@@ -95,10 +99,11 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className='absolute right-4 top-16 bg-white shadow-lg rounded-lg p-4 w-48'>
           <button 
-            onClick={handleHome}
-            className='w-full text-center py-2 text-black font-semibold rounded-full bg-blue-500 hover:bg-blue-600 mb-2'
+            onClick={handleNavigation}
+            className={`w-full text-center flex items-center gap-2 justify-center py-2 text-white font-semibold rounded-full ${isIQACDashboard ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-500 hover:bg-blue-600'} mb-2`}
           >
-            HOME
+            {isIQACDashboard && <FaStar className="text-yellow-400" />} {/* Star Icon */}
+            {isIQACDashboard ? 'GENERATE' : 'HOME'}
           </button>
           {isLoggedIn && !isHomePage && (
             <button
