@@ -1,49 +1,56 @@
 const mongoose = require("mongoose");
-const Faculty = require("./models/Faculty"); // Adjust the path based on your project structure
+const bcrypt = require("bcryptjs"); // Use bcryptjs as per your setup
+const FacultyAuthentication = require("./models/FacultyDB"); // Adjust path if needed
+require("dotenv").config();
 
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://mithunmit2023:B5KJP7lxdGPtvgdr@cluster0.trspu.mongodb.net/iqac_db?retryWrites=true&w=majority&appName=Cluster0"
-    , {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Database connected"))
+  .catch((err) => console.error("❌ DB Connection Error:", err));
 
-const seedFacultyData = async () => {
+const seedFaculty = async () => {
   try {
-    // Sample faculty documents
-    const facultyDocuments = [
+    // Clear existing data
+    await FacultyAuthentication.deleteMany();
+    console.log("🗑️ Existing faculty records removed");
+
+    // Sample faculty data with 'name' attribute
+    const facultyData = [
       {
+        name: "John Doe",
         departmentName: "Computer Science",
-        documentName: "CS Curriculum.pdf",
-        documentUrl: "/uploads/cs_curriculum.pdf",
+        emailId: "csfaculty@example.com",
+        password: await bcrypt.hash("password123", 10),
       },
       {
-        departmentName: "Mechanical Engineering",
-        documentName: "ME Lab Manual.pdf",
-        documentUrl: "/uploads/me_lab_manual.pdf",
-      },
-      {
+        name: "Alice Smith",
         departmentName: "Electrical Engineering",
-        documentName: "EE Project Guidelines.pdf",
-        documentUrl: "/uploads/ee_project_guidelines.pdf",
+        emailId: "eefaculty@example.com",
+        password: await bcrypt.hash("securepass", 10),
       },
       {
-        departmentName: "Civil Engineering",
-        documentName: "Civil Project Guidelines.pdf",
-        documentUrl: "/uploads/civil_project_guidelines.pdf",
+        name: "Robert Brown",
+        departmentName: "Mechanical Engineering",
+        emailId: "mefaculty@example.com",
+        password: await bcrypt.hash("mechpass", 10),
       },
     ];
 
-    // Clear existing data and insert new data
-    await Faculty.deleteMany({});
-    await Faculty.insertMany(facultyDocuments);
+    // Insert faculty data
+    await FacultyAuthentication.insertMany(facultyData);
+    console.log("✅ Faculty data seeded successfully!");
 
-    console.log("Faculty collection seeded successfully!");
+    // Close the database connection
     mongoose.connection.close();
   } catch (error) {
-    console.error("Error seeding faculty collection:", error);
+    console.error("❌ Error seeding data:", error);
     mongoose.connection.close();
   }
 };
 
-seedFacultyData();
+// Run the function
+seedFaculty();

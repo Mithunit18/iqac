@@ -1,8 +1,10 @@
 const express = require("express");
-const router = express.Router();
-const facultyController = require("../controllers/facultyController");
+const { uploadSingle, uploadDocument, getDocuments, getFacultyAuth } = require("../controllers/facultyController");
 
-router.post("/upload", facultyController.upload.single("document"), facultyController.facultyuploadDocument);
-router.get("/download/:id", facultyController.downloadDocument);
+const router = express.Router();
+
+router.post("/faculty-login", getFacultyAuth); // Correct route
+router.post("/upload", uploadSingle, uploadDocument);
+router.get("/documents/:emailId", getDocuments);
 
 module.exports = router;

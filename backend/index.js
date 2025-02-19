@@ -22,6 +22,7 @@ app.use(
     credentials: true,
   })
 );
+app.use("/uploads", express.static("uploads"));
 
 // Connect to database
 connectDB();
@@ -31,7 +32,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api", documentRoutes); // Mount document routes under "/api"
 app.use("/api/hod", hodRoutes); // Mount HOD routes under "/api/hod"
-app.use("/api/faculty", facultyRoutes);
+app.use("/api/faculty",facultyRoutes)
 
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {

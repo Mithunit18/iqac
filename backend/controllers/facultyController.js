@@ -1,79 +1,93 @@
-const mongoose = require("mongoose");
-const multer = require("multer");
+const bcrypt = require("bcryptjs");
+const FacultyAuthentication = require("../models/FacultyDB"); // Correct model import
 const Faculty = require("../models/Faculty");
-const { getGridFS } = require("../models/gridfaculty"); // ✅ Ensure gridFaculty is used
-const { Readable } = require("stream");
+const multer = require("multer");
 
-// Multer Storage (Buffer-Based for GridFS)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const getFacultyAuth = async (req, res) => {
+  const { departmentName, name, emailId, password } = req.body;
 
-// Upload Document to **Faculty** GridFS & Store Metadata
-const facultyuploadDocument = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    // Check if faculty exists
+    const faculty = await FacultyAuthentication.findOne({ departmentName, name, emailId });
 
-    const { departmentName, classId, section } = req.body;
-    if (!departmentName || !classId || !section) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!faculty) {
+      return res.status(400).json({ success: false, message: "User not found" });
     }
 
-    // ✅ Ensure Faculty GridFSBucket is used
-    const gfsFaculty = getGridFS();  
-    const fileStream = Readable.from(req.file.buffer);
+    // Compare hashed password
+    const isMatch = await bcrypt.compare(password, faculty.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
+    }
 
-    // ✅ Ensure it uploads to the 'faculty' bucket
-    const uploadStream = gfsFaculty.openUploadStream(req.file.originalname, {
-      contentType: req.file.mimetype,
+    // Send success response
+    res.json({ success: true, message: "Login successful" });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Save files in the "uploads" folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage });
+const uploadSingle = upload.single("file");
+
+// 📌 Upload Document Function
+const uploadDocument = async (req, res) => {
+  const { emailId, departmentName } = req.body;
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  try {
+    const documentName = req.file.originalname; // Get file name
+    const documentUrl = req.file.path; // Get file path
+
+    const newFacultyDocument = new Faculty({
+      documentName,
+      documentUrl,
+      departmentName,
+      emailId
     });
 
-    fileStream.pipe(uploadStream);
-
-    uploadStream.on("finish", async (file) => {
-      // ✅ Save reference in Faculty collection
-      const newFaculty = new Faculty({
-        departmentName,
-        classId,
-        section,
-        documentName: req.file.originalname,
-        documentId: file._id, // Reference to GridFS
-      });
-
-      await newFaculty.save();
-      res.status(201).json({ message: "File uploaded to faculty bucket", fileId: file._id });
-    });
-
-    uploadStream.on("error", (err) => {
-      console.error("Upload error:", err);
-      res.status(500).json({ message: "Upload failed" });
-    });
+    await newFacultyDocument.save();
+    res.status(200).json({ message: "Document uploaded successfully", document: newFacultyDocument });
   } catch (error) {
     console.error("Error uploading document:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Error uploading document" });
   }
 };
 
-// Download Document from **Faculty** GridFS
-const downloadDocument = async (req, res) => {
+// 📌 Get Documents Function
+const getDocuments = async (req, res) => {
+  const { emailId } = req.params;
+  
   try {
-    const gfsFaculty = getGridFS();
-    const facultyDoc = await Faculty.findById(req.params.id);
+    const facultyDocuments = await Faculty.find({ emailId });
 
-    if (!facultyDoc) return res.status(404).json({ message: "File not found in Faculty collection" });
+    if (facultyDocuments.length === 0) {
+      return res.status(200).json([]); // Return empty array instead of error
+    }
 
-    const downloadStream = gfsFaculty.openDownloadStream(new mongoose.Types.ObjectId(facultyDoc.documentId));
-
-    res.set("Content-Disposition", `attachment; filename="${facultyDoc.documentName}"`);
-    downloadStream.pipe(res);
-
-    downloadStream.on("error", (err) => {
-      console.error("Download error:", err);
-      res.status(500).json({ message: "Download failed" });
-    });
+    res.status(200).json(facultyDocuments);
   } catch (error) {
-    console.error("Error downloading document:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error fetching faculty documents:", error);
+    res.status(500).json({ error: "Error fetching faculty documents" });
   }
 };
 
-module.exports = { upload, facultyuploadDocument, downloadDocument };
+
+module.exports = { getFacultyAuth, 
+  uploadSingle,
+  uploadDocument,
+  getDocuments
+};

@@ -5,18 +5,17 @@ import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import { Toaster } from 'react-hot-toast';
 import HodDashboard from './dashboard/HodDashboard';
-import FacultyLogin from "./pages/facultylogin";
-import Facultydept from "./dashboard/facultydept";
-import Facultyclass from "./dashboard/facultyclass";
-import AdminDashboard from './dashboard/AdminDashboard';
 import IQACDashboard from './dashboard/IQACDashboard';
 import ViewPage from './dashboard/View';
 import DocumentViewer from "./dashboard/DocumentViewer";
 import UploadDocument from "./dashboard/UploadDocument";
 import ClassDetails from "./dashboard/ClassDetails";
-import Facdoc from "./dashboard/facdoc";
 import DepartmentDetails from "./dashboard/DepartmentDetails";
-import Login from './pages/Login'; 
+import Login from './pages/Login';
+import FacultyDashboard from "./dashboard/FacultyDashboard";
+import FacultyLogin from "./dashboard/FacultyLogin";
+import FacultyDetails from "./dashboard/FacultyDetails";
+import FacultyUpload from "./dashboard/FacultyUpload";
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children }) => {
@@ -57,29 +56,25 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/faculty-login" element={<FacultyLogin />} />
+          <Route path="/faculty-Details/:name/:email/:initialDepartment" element={<FacultyDetails />} />
+          <Route path="/faculty-upload/:email/:initialDepartment" element={<FacultyUpload />} />
           <Route path="/upload-class/:classId/:departmentName" element={<ClassDetails />} />
           <Route path="/view-department/:departmentId" element={<DepartmentDetails />} />
           <Route path="/view-class/:classId/:departmentName" element={<ViewPage />} />
-          <Route path="/view-facultyclass/:classId/:departmentName" element={<Facultyclass/>}/>
           <Route path="/document-viewer" element={<DocumentViewer />} />
           <Route path="/upload/:deptName" element={<UploadDocument />} />
-          <Route path="/view-faclogin/:classId/:departmentName" element={<FacultyLogin/>}/>
-          <Route path="/view-/facultydoc/:departmentId" element={<Facdoc/>}/>
           <Route path="hod-dashboard" element={
             <ProtectedRoute>
               <HodDashboard />
             </ProtectedRoute>
           } />
-          <Route path="faculty-dept" element={
+          <Route path="faculty-dashboard" element={
             <ProtectedRoute>
-              <Facultydept />
+              <FacultyDashboard />
             </ProtectedRoute>
           } />
-          <Route path="admin-dashboard" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
+          
           <Route path="iqac-dashboard" element={
             <ProtectedRoute>
               <IQACDashboard />
@@ -89,6 +84,6 @@ function App() {
       </div>
     </>
   );
-}
+}  
 
 export default App;
