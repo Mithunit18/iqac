@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -24,7 +25,7 @@ const Login = () => {
       localStorage.setItem('token', 'valid-token');  // Set a valid token for the session
       navigate(`/view-department/${departmentId}`); // Redirect to the department page
     } else {
-      alert("Invalid credentials");
+      toast.error("Invalid credentials");
     }
   };
 

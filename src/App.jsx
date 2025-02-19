@@ -32,8 +32,8 @@ const useInitializeHodData = () => {
         1: { name: "Kavitha", email: "kavitha@citchennai.net", password: "123As@121", department: "Information Technology" },
         2: { name: "Pavithra", email: "Pavithra@citchennai.net", password: "123As@122", department: "Computer Science" },
         3: { name: "john", email: "John@citchennai.net", password: "123As@123", department: "Electrical and Electronics" },
-        4: { name: "harin", email: "harin@citchennai.net", password: "123As@124", department: "Mechanical" },
-        5: { name: "saran", email: "saran@citchennai.net", password: "123As@125", department: "Civil" },
+        4: { name: "harin", email: "harin@citchennai.net", password: "123As@124", department: "Mechanical Engineering" },
+        5: { name: "saran", email: "saran@citchennai.net", password: "123As@125", department: "Civil Engineering" },
         6: { name: "doe", email: "doe@citchennai.net", password: "123As@126", department: "Electronics and Communication" },
         7: { name: "madhan", email: "madhan@citchennai.net", password: "123As@127", department: "Biotechnology" }
       };

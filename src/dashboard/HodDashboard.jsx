@@ -11,8 +11,8 @@ const HOD = () => {
     { id: 1, name: "Information Technology" },
     { id: 2, name: "Computer Science" },
     { id: 3, name: "Electrical and Electronics" },
-    { id: 4, name: "Mechanical" },
-    { id: 5, name: "Civil" },
+    { id: 4, name: "Mechanical Engineering" },
+    { id: 5, name: "Civil Engineering" },
     { id: 6, name: "Electronics and Communication" },
     { id: 7, name: "Biotechnology" },
   ];
@@ -31,7 +31,7 @@ const HOD = () => {
     if (!loggedInDepartmentId) {
       navigate("/login");
     } else if (parseInt(loggedInDepartmentId) !== departmentId) {
-      alert("You are not authorized to view this department.");
+      toast.error("You are not authorized to view this department.");
     } else {
       navigate(`/view-department/${departmentId}`);
     }

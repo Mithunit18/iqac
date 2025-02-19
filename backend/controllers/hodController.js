@@ -1,99 +1,91 @@
-const multer = require('multer');
-const { getGridFS } = require('../models/gridFS');
-const Document = require('../models/Document');
+const multer = require("multer");
+const Document = require("../models/Document");
+const Faculty = require("../models/Faculty");
+const path = require("path");
 
-// Multer configuration for file uploads
+// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Folder where files will be saved
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename
-  }
+    cb(null, Date.now() + "-" + file.originalname);
+  },
 });
-
-// Initialize multer for handling file uploads
 const upload = multer({ storage: storage });
 
-// Get documents for a specific department
+/**
+ * Fetch documents from the Faculty collection by department
+ */
 const getDocumentsByDepartment = async (req, res) => {
   const { departmentName } = req.params;
+  
   try {
-    const documents = await Document.find({ departmentName });
-    res.status(200).json(documents);
+    const facultyDocuments = await Faculty.find({ departmentName });
+
+    if (facultyDocuments.length === 0) {
+      return res.status(200).json([]); // Return empty array instead of error
+    }
+
+    res.status(200).json(facultyDocuments);
   } catch (error) {
-    console.error('Error fetching documents:', error);
-    res.status(500).send('Error fetching documents');
+    console.error("Error fetching faculty documents:", error);
+    res.status(500).json({ error: "Error fetching faculty documents" });
   }
 };
 
-// Get documents by class and department
-const getDocumentsByClass = async (req, res) => {
-  const { departmentName, classId } = req.params;
-  try {
-    const documents = await Document.find({ departmentName, classId });
-    console.log(documents);
-    res.status(200).json(documents);
-  } catch (error) {
-    console.error('Error fetching documents by class:', error);
-    res.status(500).send('Error fetching documents by class');
-  }
-};
 
-// Upload a document for a class and department
+/**
+ * Upload a document to the Document collection
+ */
 const uploadDocument = async (req, res) => {
-  const file = req.file;
-  const { departmentName, classId } = req.body; // Class-specific upload
+  const { documentName, documentUrl, departmentName, classId } = req.body;
 
-  if (!file) {
-    return res.status(400).send('No file uploaded');
+  if (!documentName || !documentUrl) {
+    return res.status(400).json({ error: "Missing document details" });
   }
 
   try {
-    const gfs = getGridFS();
-    const uploadStream = gfs.openUploadStream(file.originalname);
-    uploadStream.end(file.buffer);
-
-    uploadStream.on('finish', async () => {
-      const newDocument = new Document({
-        departmentName,
-        classId, // Save the classId along with departmentName
-        documentName: file.originalname,
-        documentUrl: `/api/document/${uploadStream.filename}` // URL to access the document
-      });
-      await newDocument.save();
-      res.status(200).send('File uploaded successfully');
+    const newDocument = new Document({
+      documentName,
+      documentUrl,
+      departmentName,
+      classId,
     });
+    await newDocument.save();
+    res.status(200).json({ message: "Document uploaded successfully" });
   } catch (error) {
-    console.error('Error uploading document:', error);
-    res.status(500).send('Error uploading document');
+    console.error("Error uploading document:", error);
+    res.status(500).json({ error: "Error uploading document" });
   }
 };
 
-// Download document by filename
+
+/**
+ * Download a document by filename
+ */
 const downloadDocument = async (req, res) => {
   const { filename } = req.params;
+
   try {
-    const gfs = getGridFS();
-    const file = await gfs.find({ filename }).toArray();
-    if (!file || file.length === 0) {
-      return res.status(404).send('File not found');
-    }
-    const readStream = gfs.openDownloadStreamByName(filename);
-    res.set('Content-Type', 'application/octet-stream');
-    res.set('Content-Disposition', `attachment; filename="${filename}"`);
-    readStream.pipe(res);
+    const filePath = path.join(__dirname, "../uploads", filename);
+
+    // Check if file exists before downloading
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        res.status(500).send('Error downloading file');
+      }
+    });
   } catch (error) {
-    console.error('Error downloading file:', error);
+    console.error('Error processing download request:', error);
     res.status(500).send('Error downloading file');
   }
 };
 
-// Exporting the controller functions and multer upload
 module.exports = {
-  upload,  // Multer upload configuration
+  upload,
   uploadDocument,
   getDocumentsByDepartment,
-  getDocumentsByClass,
-  downloadDocument
+  downloadDocument,
 };

@@ -52,8 +52,8 @@ const departmentNames = {
   1: "Information Technology",
   2: "Computer Science",
   3: "Electrical and Electronics",
-  4: "Mechanical",
-  5: "Civil",
+  4: "Mechanical Engineering",
+  5: "Civil Engineering",
   6: "Electronics and Communication",
   7: "Biotechnology",
 };
