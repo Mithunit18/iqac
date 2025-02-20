@@ -7,12 +7,13 @@ const fs = require("fs");
 // Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, 'uploads/'); // Directory where files are saved
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+    cb(null, Date.now() + '-' + file.originalname); // Unique filename with timestamp
+  }
 });
+
 const upload = multer({ storage: storage });
 
 /**
@@ -67,25 +68,26 @@ const uploadDocument = async (req, res) => {
  */
 const downloadDocument = async (req, res) => {
   const { filename } = req.params;
-
-  try {
-    const filePath = path.join(__dirname, "../uploads", filename);
-
-    // Check if the file exists
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: "File not found" });
+  console.log(filename);
+  
+    try {
+      const filePath = path.join(__dirname, "../uploads", filename);
+      console.log(filePath);
+  
+      // Check if file exists before downloading
+      res.download(filePath, (err) => {
+        if (err) {
+          console.error('Error downloading file:', err);
+          res.status(500).send('Error downloading file');
+        }
+      });
+    } catch (error) {
+      console.error('Error processing download request:', error);
+      res.status(500).send('Error downloading file');
     }
+  };
+  
 
-    // Set headers for download
-    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
-    res.setHeader("Content-Type", "application/octet-stream");
-
-    res.download(filePath);
-  } catch (error) {
-    console.error("Error processing download request:", error);
-    res.status(500).json({ error: "Error downloading file" });
-  }
-};
 
 module.exports = {
   upload,

@@ -10,7 +10,7 @@ const FacultyLogin = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialDepartment = queryParams.get("department") || ""; // Get department from URL
 
-  const [name,setName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -25,17 +25,13 @@ const FacultyLogin = () => {
     try {
       const response = await axios.post("http://localhost:5002/api/faculty/faculty-login", {
         departmentName: initialDepartment,
-        name:name,
+        name: name,
         emailId: email,
         password: password,
       });
 
-      console.log(name);
-      console.log(email);
-      console.log(initialDepartment);
-
       if (response.data.success) {
-        toast.success("Login Successfull")
+        toast.success("Login Successful");
         navigate(`/faculty-Details/${name}/${email}/${initialDepartment}`);
       } else {
         setError("Invalid credentials! Please try again.");
@@ -47,17 +43,17 @@ const FacultyLogin = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 p-40">
-      <div className="bg-white p-8 rounded-3xl shadow-lg max-w-md w-full relative">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 px-4 sm:px-6 py-12 md:p-20 lg:p-40 mt-20 md:mt-0 relative">
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-3xl shadow-lg max-w-xs sm:max-w-sm md:max-w-md w-full relative">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute left-4 top-4 text-gray-600 hover:text-blue-700 transition hover:cursor-pointer"
+          className="absolute left-2 sm:left-4 top-4 sm:top-6 text-gray-600 hover:text-blue-700 transition hover:cursor-pointer z-50"
         >
           ← Back
         </button>
 
-        <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Faculty Login</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-blue-700 mb-6 mt-10 sm:mt-12 md:mt-0">Faculty Login</h2>
 
         {/* Department Display (Instead of Dropdown) */}
         <div className="mb-4">

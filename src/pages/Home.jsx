@@ -88,7 +88,6 @@ const Home = () => {
             <option value="" disabled>Select Role</option>
             <option value="hod">HOD</option>
             <option value="faculty">Faculty</option>
-            <option value="admin">Admin</option>
             <option value="iqac_admin">IQAC Admin</option>
           </select>
 

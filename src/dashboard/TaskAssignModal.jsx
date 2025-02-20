@@ -29,10 +29,10 @@ const TaskAssignModal = ({ isOpen, onClose, department, tasks, selectedTasks, on
           ))}
         </div>
         <div className="flex justify-between mt-6">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded-md">Close</button>
+          <button onClick={onClose} className="px-4 py-2 bg-gray-600 text-white rounded-md hover:cursor-pointer hover:bg-gray-400">Close</button>
           <button
             onClick={handleTaskAssignment}
-            className="px-4 py-2 bg-blue-900 text-white rounded-md"
+            className="px-4 py-2 bg-blue-900 text-white rounded-md hover:cursor-pointer hover:bg-blue-700"
           >
             Assign Tasks
           </button>

@@ -49,7 +49,6 @@ const Signup = () => {
           <option value="" disabled>Select your role</option>
           <option value="hod">HOD</option>
           <option value="faculty">Faculty</option>
-          <option value="admin">Admin</option>
           <option value="iqac_admin">IQAC Admin</option>
         </select>
 

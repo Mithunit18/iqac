@@ -69,7 +69,7 @@ const DocumentViewer = () => {
         <div className="mb-6 flex justify-center">
           <button
             onClick={() => setIsTaskModalOpen(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg"
+            className="flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:cursor-pointer"
           >
             <ClipboardList className="w-5 h-5" />
             <span>Assign Task</span>

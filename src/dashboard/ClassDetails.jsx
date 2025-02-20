@@ -68,7 +68,7 @@ const ClassDetails = () => {
                 <span className="text-gray-800 truncate">{doc.documentName}</span>
                 <div className="flex space-x-3">
                   <a
-                    href={`http://localhost:5002${doc.documentUrl}`}
+                   href={`http://localhost:5002/api/hod/document/${encodeURIComponent(doc.documentName)}`}
                     download={doc.documentName}
                     target="_blank"
                     rel="noopener noreferrer"
