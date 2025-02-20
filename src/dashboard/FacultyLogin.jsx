@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const FacultyLogin = () => {
   const location = useLocation();
@@ -34,6 +35,7 @@ const FacultyLogin = () => {
       console.log(initialDepartment);
 
       if (response.data.success) {
+        toast.success("Login Successfull")
         navigate(`/faculty-Details/${name}/${email}/${initialDepartment}`);
       } else {
         setError("Invalid credentials! Please try again.");

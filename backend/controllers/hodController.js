@@ -2,6 +2,7 @@ const multer = require("multer");
 const Document = require("../models/Document");
 const Faculty = require("../models/Faculty");
 const path = require("path");
+const fs = require("fs");
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -70,16 +71,19 @@ const downloadDocument = async (req, res) => {
   try {
     const filePath = path.join(__dirname, "../uploads", filename);
 
-    // Check if file exists before downloading
-    res.download(filePath, (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
-        res.status(500).send('Error downloading file');
-      }
-    });
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Set headers for download
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+    res.setHeader("Content-Type", "application/octet-stream");
+
+    res.download(filePath);
   } catch (error) {
-    console.error('Error processing download request:', error);
-    res.status(500).send('Error downloading file');
+    console.error("Error processing download request:", error);
+    res.status(500).json({ error: "Error downloading file" });
   }
 };
 

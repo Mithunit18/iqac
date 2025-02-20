@@ -20,7 +20,7 @@ import FacultyUpload from "./dashboard/FacultyUpload";
 // ProtectedRoute Component
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" />;
+  return token ? children : <Navigate to="/" />;
 };
 
 // Custom Hook for Setting HOD Data

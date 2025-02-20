@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 const ClassDetails = () => {
   const { classId, departmentName } = useParams();
-  const decodedDepartmentName = decodeURIComponent(departmentName); // Ensure proper decoding
+  const decodedDepartmentName = decodeURIComponent(departmentName);
   const location = useLocation();
   const section = location.state?.section || "Academic Details";
 
@@ -33,18 +33,15 @@ const ClassDetails = () => {
   const handleUploadToDocuments = async (doc) => {
     setUploading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5002/api/hod/upload",
-        {
-          documentName: doc.documentName,
-          documentUrl: doc.documentUrl,
-          departmentName: decodedDepartmentName,
-          classId,
-        }
-      );
-      console.log("Document uploaded to Documents collection:", response.data);
+      await axios.post("http://localhost:5002/api/hod/upload", {
+        documentName: doc.documentName,
+        documentUrl: doc.documentUrl,
+        departmentName: decodedDepartmentName,
+        classId,
+      });
+
       toast.success("Document uploaded successfully!");
-      fetchFacultyDocuments(); // Refresh document list after upload
+      fetchFacultyDocuments(); // Refresh document list
     } catch (error) {
       console.error("Error uploading document:", error);
       toast.error("Failed to upload document.");
@@ -53,57 +50,48 @@ const ClassDetails = () => {
   };
 
   return (
-    <div className="bg-gray-50 py-10 px-4">
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 p-6">
+      <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md text-center">
+        <h2 className="text-3xl font-bold text-blue-700 mb-4">
           Class {classId} - {section} Documents
         </h2>
 
-        {/* Display Faculty Documents */}
-        <h3 className="text-2xl font-semibold mb-4 text-gray-700">
-          Faculty Documents
-        </h3>
-        {facultyDocuments.length === 0 ? (
-          <p className="text-center text-lg text-gray-500">
-            No faculty documents available.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {facultyDocuments.map((doc) => (
+        {/* List of Faculty Documents */}
+        <h3 className="text-xl font-semibold text-gray-700 mt-4">Faculty Documents</h3>
+        <div className="mt-3 space-y-2 max-h-80 overflow-y-auto pr-2">
+          {facultyDocuments.length > 0 ? (
+            facultyDocuments.map((doc) => (
               <div
                 key={doc._id}
-                className="p-4 bg-gray-100 rounded-md shadow-md hover:shadow-xl transition-shadow duration-300"
+                className="flex items-center justify-between bg-gray-100 p-2 rounded-md"
               >
-                <div className="flex justify-between items-center">
-                  <p className="text-lg font-medium text-gray-800 truncate">
-                    {doc.documentName}
-                  </p>
-                  <div className="flex items-center space-x-4">
-                    <a
-                      href={`http://localhost:5002${doc.documentUrl}`} // Ensure correct URL
-                      download={doc.documentName} // Force download instead of opening
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 transition-colors flex items-center"
-                    >
-                      <FiDownload className="mr-2" />
-                      <span>Download</span>
-                    </a>
+                <span className="text-gray-800 truncate">{doc.documentName}</span>
+                <div className="flex space-x-3">
+                  <a
+                    href={`http://localhost:5002${doc.documentUrl}`}
+                    download={doc.documentName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 transition flex items-center"
+                  >
+                    <FiDownload className="mr-1" /> Download
+                  </a>
 
-                    <button
-                      onClick={() => handleUploadToDocuments(doc)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700 transition-colors"
-                      disabled={uploading}
-                    >
-                      <IoCloudUploadOutline className="mr-2" />
-                      {uploading ? "Uploading..." : "Upload"}
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleUploadToDocuments(doc)}
+                    className="bg-green-600 text-white px-4 py-1 rounded-lg flex items-center hover:bg-green-700 transition"
+                    disabled={uploading}
+                  >
+                    <IoCloudUploadOutline className="mr-1" />
+                    {uploading ? "Uploading..." : "Upload"}
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <p className="text-gray-500">No faculty documents available.</p>
+          )}
+        </div>
       </div>
     </div>
   );

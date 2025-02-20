@@ -24,6 +24,7 @@ const Login = () => {
       localStorage.setItem('loggedInDepartmentId', departmentId);
       localStorage.setItem('token', 'valid-token');  // Set a valid token for the session
       navigate(`/view-department/${departmentId}`); // Redirect to the department page
+      toast.success("Login Succesfull");
     } else {
       toast.error("Invalid credentials");
     }
